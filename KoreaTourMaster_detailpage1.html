@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Bootstrap Example</title>
+    <meta charset="utf-8">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=0.59">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=c6db39689a093bbe0b59ecb99bfe98aa"></script>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=c6db39689a093bbe0b59ecb99bfe98aa&libraries=services,clusterer,drawing"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="shortcut icon" href="imgs/travel.ico">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+    <script>
+        function setCookie() {
+            var d = new Date();
+            d.setTime(d.getTime() + (7 * 24 * 60 * 1000)); //만료일
+            var expires = "expires=" + d.toLocaleDateString();
+            document.cookie = contentId1 + "=" + contentId1 + ";" + expires + ";path=/"
+            if (document.getElementById('fav').style.color == 'black') {
+                document.getElementById('fav').style.color = '#ffd700';
+            }
+            else {
+                document.getElementById('fav').style.color = 'black';
+                delCookie();
+            }
+        }
+
+        function delCookie() {
+            var expires = -1;
+            document.cookie = contentId1 + "=" + "" + ";" + expires + ";path=/";
+        }
+        var contentId1;
+        var v4original = new Array();
+        var v4small = new Array();
+        $(document).ready(function () {
+            var v1, v1title = ""
+                , v1addr = ""
+                , v1mapx = ""
+                , v1mapy = ""
+                , v1overview = ""
+                , v1tel = ""
+                , v1zipcode = ""
+                , v1firstimage;
+            var v2, v2opentime, v2packing, v2smpking, v2infocenterfood;
+            //http://127.0.0.1:59376/KoreaTourMaster_detail1.html?&contentId=2033064&contenttypeid=28
+            //contentID 얻기
+            function getParameter(parameterName) {
+                var url = location.href;
+                var tmp = url.split('?')[1];
+                //            console.log(tmp);
+                var paraArr = tmp.split('&');
+                //            console.log(paraArr);
+                for (var i in paraArr) {
+                    //                console.log(paraArr[i].indexOf(parameterName));
+                    if (paraArr[i].indexOf(parameterName) >= 0) {
+                        return paraArr[i].split('=')[1]
+                    }
+                }
+            }
+            var contentId = getParameter('contentId');
+            contentId1 = contentId;
+            var contenttypeid = getParameter('contenttypeid');
+            var mapx = getParameter('mapx');
+            var mapy = getParameter('mapy');
+            console.log(mapx + "," + mapy);
+            //    console.log(contentId + " or " +  contenttypeid);
+            //공통정보
+            var baseurl1 = "http://api.visitkorea.or.kr/openapi/service/rest/KorService/detailCommon?";
+            var etc1 = "ServiceKey=0IZ0PMlWagnjOknvB2XEdo%2B1J8rQ0lY0u3DuSmBULBZhaLLgkXRM8V4pR6c36qHIg%2BMmkQmGVcx8GJubWJfAzw%3D%3D&contentTypeId=" + contenttypeid + "&contentId=" + contentId + "&MobileOS=ETC&MobileApp=TourAPI3.0_Guide&defaultYN=Y&firstImageYN=Y&areacodeYN=Y&catcodeYN=Y&addrinfoYN=Y&mapinfoYN=Y&overviewYN=Y&transGuideYN=Y";
+            $.ajax({
+                type: 'GET', //통신방식(GET/POST)
+                url: baseurl1 + etc1, //통신할 대상
+                dataType: 'json', //서버로부터 받을 데이터 형식
+                success: function (data) { //통신에 성공했을 때,
+                    //             console.log(data);
+                    v1 = data.response.body.items.item;
+                    v1title = v1.title;
+                    v1addr = v1.addr1 + v1.addr2;
+                    v1mapx = v1.mapx;
+                    v1mapy = v1.mapy;
+                    v1overview = v1.overview;
+                    v1tel = v1.tel;
+                    v1zipcode = v1.zipcode;
+                    v1firstimage = v1.firstimage;
+                    //             console.log(v1addr + v1mapx +v1mapy + v1overview + v1tel + v1zipcode);
+                    //             console.log(v1title);
+                    $('#v1title').text(v1title);
+                    document.title = $('#v1title').text();
+                    $('#v1overview').html(v1overview);
+                    //             console.log(v1overview);
+                    $('#titleimage').attr("style", "background-image:url('" + v1firstimage + "'); background-repeat:no-repeat; background-size:cover; opacity:1;");
+                    if (!v1firstimage) {
+                        $('#titleimage').attr("style", "background-image:url(img/korea.jpg);");
+                    }
+                    $('#v1addr').text("주소:" + v1addr);
+                    if (!v1.addr1) {
+                        $('#v1addr').empty();
+                    }
+                    $('#v1tel').text("전화번호:" + v1tel);
+                    if (!v1.tel) {
+                        $('#v1tel').empty();
+                    }
+                    $('#v1zipcode').text("우편번호:" + v1zipcode);
+                    if (!v1.zipcode) {
+                        $('#v1zipcode').empty();
+                    }
+                }
+                , error: function (req) { //통신에 실패했을 때
+                    alert('통신실패, 상태:', req.responseText)
+                }
+            });
+            //    console.log(v1);
+            //                console.log(v1firstimage);
+            //소개정보
+            var v2, v2opentime, v2packing, v2smoking, v2infocenterfood, v2chkbabycarriageleports, v2chkcreditcardleports, v2chkpetleports, v2reservation;
+            var baseurl2 = "http://api.visitkorea.or.kr/openapi/service/rest/KorService/detailIntro?";
+            var etc2 = "ServiceKey=0IZ0PMlWagnjOknvB2XEdo%2B1J8rQ0lY0u3DuSmBULBZhaLLgkXRM8V4pR6c36qHIg%2BMmkQmGVcx8GJubWJfAzw%3D%3D&contentTypeId=" + contenttypeid + "&contentId=" + contentId + "&MobileOS=ETC&MobileApp=TourAPI3.0_Guide&introYN=Y";
+            $.ajax({
+                type: 'GET', //통신방식(GET/POST)
+                url: baseurl2 + etc2, //통신할 대상
+                dataType: 'json', //서버로부터 받을 데이터 형식
+                success: function (data) { //통신에 성공했을 때,
+                    //                console.log(data);
+                    v2 = data.response.body.items.item;
+                    v2opentime = v2.opentime;
+                    console.log(v2);
+                    $('#v2opentime').html("오픈시간: " + v2opentime);
+                    if (!v2.opentime) {
+                        $('#v2opentime').empty();
+                    }
+                    v2packing = v2.packing;
+                    $('#v2packing').html("포장: " + v2packing);
+                    if (!v2.packing) {
+                        $('#v2packing').empty();
+                    }
+                    v2smoking = v2.smoking;
+                    $('#v2smoking').html("흡연가능여부: " + v2smoking);
+                    if (!v2.smoking) {
+                        $('#v2smoking').empty();
+                    }
+                    v2infocenterfood = v2.inforcenterfood; //예약안내
+                    $('#v2infocenterfood').html("예약안내: " + v2infocenterfood);
+                    if (!v2.inforcenterfood) {
+                        $('#v2infocenterfood').empty();
+                    }
+                    v2chkbabycarriageleports = v2.chkbabycarriageleports //베이비시트여부
+                    $('#v2chkbabycarriageleports').html("베이비시트여부: " + v2chkbabycarriageleports);
+                    if (!v2.chkbabycarriageleports) {
+                        $('#v2chkbabycarriageleports').empty();
+                    }
+                    v2chkcreditcardleports = v2.chkcreditcardleports //신용카드여부
+                    $('#v2chkcreditcardleports').html("신용카드여부: " + v2chkcreditcardleports);
+                    if (!v2.chkcreditcardleports) {
+                        $('#v2chkcreditcardleports').empty();
+                    }
+                    v2chkpetleports = v2.chkpetleports //펫시트여부
+                    $('#v2chkpetleports').html("펫시트여부: " + v2chkpetleports);
+                    if (!v2.chkpetleports) {
+                        $('#v2chkpetleports').empty();
+                    }
+                    v2reservation = v2.reservation //예약하기
+                    $('#v2reservation').html("예약하기: " + v2reservation);
+                    if (!v2.reservation) {
+                        $('#v2reservation').empty();
+                    }
+                    v2bookingplace = v2.bookingplace;
+                    $('#bookingplace').html("예약하기:" + v2bookingplace);
+                    if (!v2.bookingplace) {
+                        $('#bookingplace').empty();
+                    }
+                    v2scale = v2.scale;
+                    $('#scale').html("면적:" + v2scale);
+                    if (!v2.scale) {
+                        $('#scale').empty();
+                    }
+                    infocenterculture = v2.infocenterculture;
+                    $('#infocenterculture').html("정보:" + infocenterculture);
+                    if (!v2.infocenterculture) {
+                        $('#infocenterculture').empty();
+                    }
+                    parkingculture = v2.parkingculture;
+                    $('#parkingculture').html("주차:" + parkingculture);
+                    if (!v2.parkingculture) {
+                        $('#parkingculture').empty();
+                    }
+                    parkingfee = v2.parkingfee;
+                    $('#parkingfee').html("주차비:" + parkingfee);
+                    if (!v2.parkingfee) {
+                        $('#parkingfee').empty();
+                    }
+                    restdateculture = v2.restdateculture;
+                    $('#restdateculture').html("휴관일:" + restdateculture);
+                    if (!v2.restdateculture) {
+                        $('#restdateculture').empty();
+                    }
+                    agelimit = v2.agelimit;
+                    $('#agelimit').html("연령제한:" + agelimit);
+                    if (!v2.agelimit) {
+                        $('#agelimit').empty();
+                    }
+                    eventplace = v2.eventplace;
+                    $('#eventplace').html("장소:" + eventplace);
+                    if (!v2.eventplace) {
+                        $('#eventplace').empty();
+                    }
+                    placeinfo = v2.placeinfo;
+                    $('#placeinfo').html("장소정보:" + placeinfo);
+                    if (!v2.placeinfo) {
+                        $('#placeinfo').empty();
+                    }
+                    discountinfofestival = v2.discountinfofestival;
+                    $('#discountinfofestival').html("할인:" + discountinfofestival);
+                    if (!v2.discountinfofestival) {
+                        $('#discountinfofestival').empty();
+                    }
+                    playtime = v2.playtime;
+                    $('#playtime').html("기간:" + playtime);
+                    if (!v2.playtime) {
+                        $('#playtime').empty();
+                    }
+                    program = v2.program;
+                    $('#program').html("프로그램:" + program);
+                    if (!v2.program) {
+                        $('#program').empty();
+                    }
+                    distance = v2.distance;
+                    $('#distance').html("길이:" + distance);
+                    if (!v2.distance) {
+                        $('#distance').empty();
+                    }
+                    parkingleports = v2.parkingleports;
+                    $('#parkingleports').html("주차여부:" + parkingleports);
+                    if (!v2.parkingleports) {
+                        $('#parkingleports').empty();
+                    }
+                    restdateleports = v2.restdateleports;
+                    $('#restdateleports').html("쉬는날:" + restdateleports);
+                    if (!v2.restdateleports) {
+                        $('#restdateleports').empty();
+                    }
+                    expagerangeleports = v2.expagerangeleports;
+                    $('#expagerangeleports').html("나이제한:" + expagerangeleports);
+                    if (!v2.expagerangeleports) {
+                        $('#expagerangeleports').empty();
+                    }
+                    usetimeleports = v2.usetimeleports;
+                    $('#usetimeleports').html("이용가능시간:" + usetimeleports);
+                    if (!v2.usetimeleports) {
+                        $('#usetimeleports').empty();
+                    }
+                    accomcountlodging = v2.accomcountlodging;
+                    $('#accomcountlodging').html("수용인원:" + accomcountlodging);
+                    if (!v2.accomcountlodging) {
+                        $('#accomcountlodging').empty();
+                    }
+                    reservationurl = v2.reservationurl;
+                    $('#reservationurl').html("예약하기:" + reservationurl);
+                    if (!v2.reservationurl) {
+                        $('#reservationurl').empty();
+                    }
+                    roomcount = v2.roomcount;
+                    $('#roomcount').html("방개수:" + roomcount);
+                    if (!v2.roomcount) {
+                        $('#roomcount').empty();
+                    }
+                    scalelodging = v2.scalelodging;
+                    $('#scalelodging').html("크기:" + scalelodging);
+                    if (!v2.scalelodging) {
+                        $('#scalelodging').empty();
+                    }
+                    subfacility = v2.subfacility;
+                    $('#subfacility').html("부가시설:" + subfacility);
+                    if (!v2.subfacility) {
+                        $('#subfacility').empty();
+                    }
+                    checkintime = v2.checkintime;
+                    $('#checkintime').html("체크인시간:" + checkintime);
+                    if (!v2.checkintime) {
+                        $('#checkintime').empty();
+                    }
+                    checkouttime = v2.checkouttime;
+                    $('#checkouttime').html("체크아웃시간:" + checkouttime);
+                    if (!v2.checkouttime) {
+                        $('#checkouttime').empty();
+                    }
+                    parkingshopping = v2.parkingshopping;
+                    $('#parkingshopping').html("주차:" + parkingshopping);
+                    if (!v2.parkingshopping) {
+                        $('#parkingshopping').empty();
+                    }
+                    shopguide = v2.shopguide;
+                    $('#shopguide').html("가이드:" + shopguide);
+                    if (!v2.shopguide) {
+                        $('#shopguide').empty();
+                    }
+                    chkbabycarriageshopping = v2.chkbabycarriageshopping;
+                    $('#chkbabycarriageshopping').html("유모차:" + chkbabycarriageshopping);
+                    if (!v2.chkbabycarriageshopping) {
+                        $('#chkbabycarriageshopping').empty();
+                    }
+                    chkcreditcardshopping = v2.chkcreditcardshopping;
+                    $('#chkcreditcardshopping').html("신용카드:" + chkcreditcardshopping);
+                    if (!v2.chkcreditcardshopping) {
+                        $('#chkcreditcardshopping').empty();
+                    }
+                    restdateshopping = v2.restdateshopping;
+                    $('#restdateshopping').html("쉬는날:" + restdateshopping);
+                    if (!v2.restdateshopping) {
+                        $('#restdateshopping').empty();
+                    }
+                    saleitem = v2.saleitem;
+                    $('#saleitem').html("품목:" + saleitem);
+                    if (!v2.saleitem) {
+                        $('#saleitem').empty();
+                    }
+                    chkpetshopping = v2.chkpetshopping;
+                    $('#chkpetshopping').html("애완동물시트:" + chkpetshopping);
+                    if (!v2.chkpetshopping) {
+                        $('#chkpetshopping').empty();
+                    }
+                    chkcreditcardfood = v2.chkcreditcardfood;
+                    $('#chkcreditcardfood').html("신용카드:" + chkcreditcardfood);
+                    if (!v2.chkcreditcardfood) {
+                        $('#chkcreditcardfood').empty();
+                    }
+                    firstmenu = v2.firstmenu;
+                    $('#firstmenu').html("메인메뉴:" + firstmenu);
+                    if (!v2.firstmenu) {
+                        $('#firstmenu').empty();
+                    }
+                    opentimefood = v2.opentimefood;
+                    $('#opentimefood').html("오픈시간:" + opentimefood);
+                    if (!v2.opentimefood) {
+                        $('#opentimefood').empty();
+                    }
+                    restdatefood = v2.restdatefood;
+                    $('#restdatefood').html("쉬는날:" + restdatefood);
+                    if (!v2.restdatefood) {
+                        $('#restdatefood').empty();
+                    }
+                    parkingfood = v2.parkingfood;
+                    $('#parkingfood').html("주차:" + parkingfood);
+                    if (!v2.parkingfood) {
+                        $('#parkingfood').empty();
+                    }
+                    usetimeculture = v2.usetimeculture;
+                    $('#usetimeculture').html("이용가능시간:" + usetimeculture);
+                    if (!v2.usetimeculture) {
+                        $('#usetimeculture').empty();
+                    }
+                    usefee = v2.usefee;
+                    $('#usefee').html("이용료:" + usefee);
+                    if (!v2.usefee) {
+                        $('#usefee').empty();
+                    }
+                    scaleleports = v2.scaleleports;
+                    $('#scaleleports').html("면적:" + scaleleports);
+                    if (!v2.scaleleports) {
+                        $('#scaleleports').empty();
+                    }
+                    var bookmarknum = new Array();
+                    var cookArr = document.cookie.split(';');
+                    var booked = false;
+                    for (var i = 0; i < cookArr.length; i++) {
+                        var seper = cookArr[i].split('=');
+                        bookmarknum.push(seper[1]);
+                        if (contentId == seper[1]) {
+                            document.getElementById('fav').style.color = '#ffd700';
+                            //쿠키에 있는거 가져오기   
+                        }
+                    }
+                }
+                , error: function (req) { //통신에 실패했을 때
+                    alert('통신실패, 상태:', req.responseText)
+                }
+            });
+            //            console.log(contentId);
+            //추가이미지
+            var v4;
+            var vv;
+            var baseurl4 = "http://api.visitkorea.or.kr/openapi/service/rest/KorService/detailImage?";
+            var etc4 = "ServiceKey=0IZ0PMlWagnjOknvB2XEdo%2B1J8rQ0lY0u3DuSmBULBZhaLLgkXRM8V4pR6c36qHIg%2BMmkQmGVcx8GJubWJfAzw%3D%3D&contentTypeId=" + contenttypeid + "&MobileOS=ETC&MobileApp=TourAPI3.0_Guide&contentId=" + contentId + "&imageYN=Y";
+            $.ajax({
+                type: 'GET', //통신방식(GET/POST)
+                url: baseurl4 + etc4, //통신할 대상
+                dataType: 'json', //서버로부터 받을 데이터 형식
+                success: function (data) { //통신에 성공했을 때,
+                    v4 = data.response.body.items.item;
+                    //             console.log(v4);
+                    for (var i = 0; i < v4.length; i++) {
+                        v4original.push(v4[i].originimgurl);
+                    }
+                    //             console.log(v4original);
+                    //             console.log(v4small)
+                    var output = ""
+                    for (var i = 0; i < v4original.length; i++) {
+                        output += "<span onclick='cng" + i + "()' style='margin:5px;'><img id='small" + i + "'src='" + v4original[i] + "' style='width:98%;'></span>"
+                    }
+                    $('#smallimg').append(output);
+                    //                    output2 = "<img id='original' src='" + v4original[0] + "' style='width:202.6%;'>"
+                    //                    $('#bigimg').append(output2);
+                }
+                , error: function (req) { //통신에 실패했을 때
+                    alert('통신실패, 상태:', req.responseText)
+                }
+            });
+            var container = document.getElementById('map'); //지도를 담을 영역의 DOM 레퍼런스
+            var options = { //지도를 생성할 때 필요한 기본 옵션
+                center: new daum.maps.LatLng(mapy, mapx), //지도의 중심좌표.
+                level: 3 //지도의 레벨(확대, 축소 정도)
+            };
+            var map = new daum.maps.Map(container, options); //지도 생성 및 객체 리턴
+            var marker = new daum.maps.Marker({
+                // 지도 중심좌표에 마커를 생성합니다 
+                position: map.getCenter()
+            });
+            marker.setMap(map);
+            daum.maps.event.addListener(marker, 'click', function () {
+                window.location.href = "http://map.daum.net/link/to/" + v1.title + "," + mapy + "," + mapx;
+            });
+            var iwContent = '<div style="padding:10px;">길찾기 시작</div>'; // 인포윈도우에 표출될 내용으로 HTML 문자열이나 document element가 가능합니다
+            // 인포윈도우를 생성합니다
+            var infowindow = new daum.maps.InfoWindow({
+                content: iwContent
+            });
+            // 마커에 마우스오버 이벤트를 등록합니다
+            daum.maps.event.addListener(marker, 'mouseover', function () {
+                // 마커에 마우스오버 이벤트가 발생하면 인포윈도우를 마커위에 표시합니다
+                infowindow.open(map, marker);
+            });
+            // 마커에 마우스아웃 이벤트를 등록합니다
+            daum.maps.event.addListener(marker, 'mouseout', function () {
+                // 마커에 마우스아웃 이벤트가 발생하면 인포윈도우를 제거합니다
+                infowindow.close();
+            });
+        });
+
+        function cng0() {
+            $('#original').attr("src", v4original[0]);
+        }
+
+        function cng1() {
+            $('#original').attr("src", v4original[1]);
+        }
+
+        function cng2() {
+            $('#original').attr("src", v4original[2]);
+        }
+
+        function cng3() {
+            $('#original').attr("src", v4original[3]);
+        }
+
+        function cng4() {
+            $('#original').attr("src", v4original[4]);
+        }
+
+        function cng5() {
+            $('#original').attr("src", v4original[5]);
+        }
+
+        function cng6() {
+            $('#original').attr("src", v4original[6]);
+        }
+
+        function cng7() {
+            $('#original').attr("src", v4original[7]);
+        }
+
+        function cng8() {
+            $('#original').attr("src", v4original[8]);
+        }
+
+        function cng9() {
+            $('#original').attr("src", v4original[9]);
+        }
+
+        function backing() {
+            window.history.back();
+        }
+    </script>
+    <style>
+        /*
+        @media (max-width: 360px) {
+            .main {
+                width:340px;
+            }
+*/
+        
+        #titleimage {
+            width: 100%;
+            height: 400px;
+        }
+        
+        #small0:hover {
+            cursor: pointer;
+        }
+        
+        #small1:hover {
+            cursor: pointer;
+        }
+        
+        #small2:hover {
+            cursor: pointer;
+        }
+        
+        #small3:hover {
+            cursor: pointer;
+        }
+        
+        #small4:hover {
+            cursor: pointer;
+        }
+        
+        #small5:hover {
+            cursor: pointer;
+        }
+        
+        #small6:hover {
+            cursor: pointer;
+        }
+        
+        #small7:hover {
+            cursor: pointer;
+        }
+        
+        #small8:hover {
+            cursor: pointer;
+        }
+        
+        #small9:hover {
+            cursor: pointer;
+        }
+        
+        .footer {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            width: 100%;
+            height: 50px;
+            background-color: #337ab7;
+        }
+        
+        .main {
+            width: 600px;
+            position: relative;
+            margin: auto;
+            background-color: aliceblue;
+        }
+        
+        {}
+        
+        #backback:hover {
+            cursor: pointer;
+        }
+        
+        .gg:hover {
+            opacity: 0.5;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <div class="main" style="border:2px solid gainsboro;"> <img src="img/back1.png" style="width: 88px; height: 79px; float: left;margin-top:12px;margin-left:5px;" onclick="backing()" id="backback" class="gg">
+            <div class="sns" style="margin-left:17%;opacity: 0.6;margin-right: 13.5%;margin-top:2%;margin-bottom:3%;border: 4px solid black;padding: 5px;background-color: black">
+                <!-- Share on Twitter --><a href="#"><i class="fas fa-star" style="width: 66px; height: 62px;font-size: 50px;text-align: center;vertical-align: middle;background-color: white;padding-top: 5px; color:black;" onclick="setCookie();" class="gg" id="fav" ></i></a>
+                <a href="#" onclick="javascript:window.open('https://twitter.com/intent/tweet?text=[%EA%B3%B5%EC%9C%A0]%20'
+            +encodeURIComponent(document.URL)+'%20-%20'+encodeURIComponent(document.title), 'twittersharedialog',
+             'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;" target="_blank" alt="Share on Twitter"><img src="img/Twitter.png" class="gg"></a>
+                <!-- Share on Facebook -->
+                <a href="#" onclick="javascript:window.open('https://www.facebook.com/sharer/sharer.php?u='
+            +encodeURIComponent(document.URL)+'&amp;t='+encodeURIComponent(document.title), 'facebooksharedialog',
+             'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;" target="_blank" alt="Share on Facebook"> <img src="img/Facebook.png" class="gg"></a>
+                <!-- Share on Google+ -->
+                <a href="#" onclick="javascript:window.open('https://plus.google.com/share?url='+encodeURIComponent(document.URL), 'googleplussharedialog','menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=350,width=600');return false;" target="_blank" alt="Share on Google+"> <img src="img/Google_Plus.png" class="gg"></a>
+                <!-- Share on Kakaostory -->
+                <a href="#" onclick="javascript:window.open('https://story.kakao.com/s/share?url='+encodeURIComponent(document.URL), 'kakaostorysharedialog', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=400,width=600');return false;" target="_blank" alt="Share on kakaostory"> <img src="img/Kakao_Story.png" class="gg"></a>
+                <!-- Share on Naver -->
+                <a href="#" onclick="javascript:window.open('http://share.naver.com/web/shareView.nhn?url='
+            +encodeURIComponent(document.URL)+'&amp;title='+encodeURIComponent(document.title),
+             'naversharedialog', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;" target="_blank" alt="Share on Naver"> <img src="img/Naver.png" class="gg"></a>
+            </div>
+            <div id="titleimage" style="text-shadow: 2px 2px 2px gray; margin-bottom: 0; padding: 0;"> </div>
+            <h1 id="v1title" style="color: black; text-align: center; ">title</h1>
+            <p id="v1overview" style="color: black;font-size: 14px;">부가설명</p>
+            <div id="map" style="width:100%;height:250px; margin: 0"> </div>
+            <div style="width: 98%"> <span class="cooo" style="width: 100%; margin: 10px; padding: 0; display: inline-block">      
+      <p id="v1addr"></p>
+      <p id="v1tel"></p>
+      <p id="v1zipcode"></p>
+      <p id="v2opentime"></p>
+      <p id="v2packing"></p>
+      <p id="v2smoking"></p>
+      <p id="v2infocenterfood"></p>
+      <p id="v2chkbabycarriageleports"></p>
+      <p id="v2chkcreditcardleports"></p>
+      <p id="v2chkpetleports"></p>
+      <p id="v2reservation"></p> 
+      <p id="bookingplace"></p> 
+      <p id="scale"></p> 
+      <p id="infocenterculture"></p> 
+      <p id="parkingculture"></p> 
+      <p id="parkingfee"></p> 
+      <p id="restdateculture"></p> 
+      <p id="agelimit"></p> 
+      <p id="eventplace"></p> 
+      <p id="placeinfo"></p> 
+      <p id="discountinfofestival"></p> 
+      <p id="playtime"></p> 
+      <p id="program"></p> 
+      <p id="distance"></p> 
+      <p id="parkingleports"></p> 
+      <p id="restdateleports"></p> 
+      <p id="expagerangeleports"></p> 
+      <p id="usetimeleports"></p> 
+      <p id="accomcountlodging"></p> 
+      <p id="reservationurl"></p> 
+      <p id="roomcount"></p> 
+      <p id="scalelodging"></p> 
+      <p id="subfacility"></p> 
+      <p id="checkintime"></p> 
+      <p id="checkouttime"></p> 
+      <p id="parkingshopping"></p> 
+      <p id="shopguide"></p> 
+      <p id="chkbabycarriageshopping"></p> 
+      <p id="chkcreditcardshopping"></p> 
+      <p id="restdateshopping"></p> 
+      <p id="saleitem"></p> 
+      <p id="chkpetshopping"></p> 
+      <p id="chkcreditcardfood"></p> 
+      <p id="firstmenu"></p> 
+      <p id="opentimefood"></p> 
+      <p id="restdatefood"></p> 
+      <p id="parkingfood"></p> 
+      <p id="usetimeculture"></p> 
+      <p id="usefee"></p> 
+      <p id="scaleleports"></p> 
+</span> </div>
+            <div id="smallimg" style="height: 100px;"> </div>
+        </div>
+    </div>
+</body>
+
+</html>

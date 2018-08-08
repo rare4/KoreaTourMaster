@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Korea Travel</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Anton|Do+Hyeon|Exo+2|Nanum+Gothic|Yanone+Kaffeesatz" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <meta content="yes" name="apple-mobile-web-app-capable" />
+    <meta content="minimum-scale=1.0, width=device-width, maximum-scale=1, user-scalable=no" name="viewport" />
+    <link rel="shortcut icon" href="imgs/travel.ico">
+    <f:view contentType=”text/html”/>
+    <script>
+        var data4 = new Array();
+        var title = new Array();
+        var keyword = "";
+        var contentTypeId = "";
+        var areacodeS = 0;
+        var pageno = 1;
+        var searchType = 0;
+        var keywordtemp = "";
+        var datatype = "";
+
+        function click1(value) {
+            var hehe = $(value).text();
+            $("input")[1].value = hehe;
+            keyword = hehe;
+            keywordtemp = hehe;
+            $('#searchbar').val(hehe);
+        }
+
+        function reload4(value) {
+            keyword = $('#searchbar').val();
+            keyword2 = keyword.length;
+            if (keyword2 >= 2) {
+                $(title).empty();
+                $('.list-group').text("");
+                var baseurl = "http://api.visitkorea.or.kr/openapi/service/rest/KorService/searchKeyword?";
+                var etc = "serviceKey=5r3%2Bf8PsWZ96ejWh3oTgDYImPr7wL2l2zEL5Sw94uZyX40Pgo6NOdyedCj5VxSkHn8TYCwev64iVm0mvOWQFlA%3D%3D&MobileApp=AppTest&MobileOS=ETC&pageNo=1&startPage=1&listYN=Y&arrange=B&numOfRows=8&pageSize=8&keyword=" + keyword + "&output=json";
+                $.ajax({
+                    type: 'GET', //통신방식(GET/POST)
+                    url: baseurl + etc, //통신할 대상
+                    dataType: 'json', //서버로부터 받을 데이터 형식
+                    success: function (data) { //통신에 성공했을 때,
+                        console.log(data);
+                        var items = data.response.body.items.item;
+                        console.log(items);
+                        for (i = 0; i < items.length; i++) {
+                            title.push(items[i].title);
+                        }
+                        var output2 = "<ul class='list-group' name='myList1' style='height: 500px;z-index:2'>";
+                        for (i = 0; i < title.length; i++) {
+                            output2 += "<li class='list-group-item' onclick='click1(this)'>" + title[i] + "</li>"
+                        }
+                        output2 += "</ul>";
+                        $('#myList').append(output2);
+                        title.length = 0;
+                        console.log(items);
+                        console.log(data);
+                        data4 = items;
+                        console.log(data4);
+                        console.log($('#myList'));
+                        if ($('[name=myList1]').length > 1) {
+                            $('[name=myList1]')[0].remove();
+                        }
+                    }
+                    , error: function (req) { //통신에 실패했을 때
+                        alert('통신실패, 상태:', req.responseText)
+                    }
+                });
+            }
+        };
+
+        function goSearch() {
+            $('.sns').css('display', 'none');
+            pageno = 1;
+            //            $("input[name='search3']").val() = keywordtemp;
+            searchType = 1;
+            keyword = $('#searchbar').val().trim();
+            var tmp = keyword.split(' ');
+            var baseurl = "http://api.visitkorea.or.kr/openapi/service/rest/KorService/searchKeyword?";
+            var etc = "serviceKey=5r3%2Bf8PsWZ96ejWh3oTgDYImPr7wL2l2zEL5Sw94uZyX40Pgo6NOdyedCj5VxSkHn8TYCwev64iVm0mvOWQFlA%3D%3D&MobileApp=AppTest&MobileOS=ETC&pageNo=" + pageno + "&startPage=1&listYN=Y&arrange=B&numOfRows=20&pageSize=20&keyword=" + keyword + "&output=json";
+            $(".main").css("display", "none");
+            $("#Searchafter").css("display", "block");
+            $.ajax({
+                type: 'GET', //통신방식(GET/POST)
+                url: baseurl + etc, //통신할 대상
+                dataType: 'json', //서버로부터 받을 데이터 형식
+                success: function (data) { //통신에 성공했을 때,
+                    console.log(data);
+                    var items = data.response.body.items.item;
+                    console.log(items);
+                    for (i = 0; i < items.length; i++) {
+                        title.push(items[i].title);
+                    }
+                    data4 = items;
+                    searchCode(tmp);
+                }
+                , error: function (req) { //통신에 실패했을 때
+                    alert('통신실패, 상태:', req.responseText)
+                }
+            })
+            $("input")[1].value = keywordtemp;
+        }
+
+        function searchCode(sigu) {
+            //            $('.list-group').html("");
+            if (data4.length > 1) {
+                $('.list-group').html("");
+                var output = "<div class='list-group'>";
+                $.each(data4, function (i, e) {
+                    if (e.title.indexOf($('#searchbar2').val()) != -1) {
+                        output += "<a href='KoreaTourMaster_detailpage1.html?&contentId=" + e.contentid + "&contenttypeid=" + e.contenttypeid + "&mapx=" + e.mapx + "&mapy=" + e.mapy + "' class='list-group-item list-group-item-primary'>";
+                        if (e.firstimage) {
+                            output += "<li class='list-group-item list-group-item-primary'><img src='" + e.firstimage + "' width='300px' height='150px'>" + "<h3>" + e.title + "</h3>";
+                        }
+                        if (e.firstimage == null) {
+                            output += "<li class='list-group-item list-group-item-primary'><img src='imgs/noImage.gif' width='140px' height='70px'>" + "<h3>" + e.title + "</h3>";
+                        };
+                        output += "<h5>" + e.addr1 + "</h5></li></a>";
+                    }
+                });
+                output += "</ul>";
+                $('#Searchafter').append(output);
+            }
+            else if (data4.length == undefined) {
+                $('.list-group').html("");
+                var output = "<div class='list-group'>";
+                output += "<a href='KoreaTourMaster_detailpage1.html?&contentId=" + data4.contentid + "&contenttypeid=" + data4.contenttypeid + "&mapx=" + data4.mapx + "&mapy=" + data4.mapy + "' class='list-group-item list-group-item-primary'>";
+                if (data4.firstimage) {
+                    output += "<li class='list-group-item list-group-item-primary'><img src='" + data4.firstimage + "' width='300px' height='150px'>" + data4.addr1;
+                }
+                if (data4.firstimage == null) {
+                    output += "<li class='list-group-item list-group-item-primary'><img src='imgs/noImage.gif' width='140px' height='70px'>" + data4.addr1;
+                };
+                output += "<h3>" + data4.title + "</h3></li></a>";
+                output += "</ul></div>";
+                $('#Searchafter').append(output);
+            }
+        }
+        //$(document).scroll() // 스크롤이 변경될때마다 이벤트를 발생시킴
+        //$(document).height() // 현재페이지(문서)의 높이 
+        //$(window).height() // 윈도우의 크기 
+        //$(window).scrollTop() // 브라우저의 스크롤 위치값
+        function click2(value) {
+            var hehe = $(value).text();
+            $('#searchbar2').val(hehe);
+        }
+
+        function reload5(value) {
+            $('.list-group').html("");
+            keyword = $('#searchbar2').val();
+            keyword2 = keyword.length;
+            if (keyword2 >= 2) {
+                var baseurl = "http://api.visitkorea.or.kr/openapi/service/rest/KorService/searchKeyword?";
+                var etc = "serviceKey=5r3%2Bf8PsWZ96ejWh3oTgDYImPr7wL2l2zEL5Sw94uZyX40Pgo6NOdyedCj5VxSkHn8TYCwev64iVm0mvOWQFlA%3D%3D&MobileApp=AppTest&MobileOS=ETC&pageNo=1&startPage=1&listYN=Y&arrange=B&numOfRows=8&pageSize=8&keyword=" + keyword + "&output=json";
+                $.ajax({
+                    type: 'GET', //통신방식(GET/POST)
+                    url: baseurl + etc, //통신할 대상
+                    dataType: 'json', //서버로부터 받을 데이터 형식
+                    success: function (data) { //통신에 성공했을 때,
+                        console.log(data);
+                        var items = data.response.body.items.item;
+                        console.log(items);
+                        for (i = 0; i < items.length; i++) {
+                            title.push(items[i].title);
+                        }
+                        var output2 = "<ul class='list-group' name='myList21' style='height: 500px;'>";
+                        for (i = 0; i < items.length; i++) {
+                            output2 += "<li class='list-group-item' onclick='click2(this)'>" + title[i] + "</li>"
+                        }
+                        output2 += "</ul>";
+                        $('#myList20').append(output2);
+                        title.length = 0;
+                        console.log(items);
+                        console.log(data);
+                        data4 = items;
+                        console.log(data4);
+                        if ($('[name=myList21]').length > 1) {
+                            $('[name=myList21]')[0].remove();
+                        }
+                    }
+                    , error: function (req) { //통신에 실패했을 때
+                        alert('통신실패, 상태:', req.responseText)
+                    }
+                });
+            }
+        };
+
+        function goSearch2() {
+            $('.sns').css('display', 'none');
+            pageno = 1;
+            $("[name=myList21]").empty();
+            searchType = 1;
+            var keyword = $('#searchbar2').val().trim();
+            var tmp = keyword.split(' ');
+            var baseurl = "http://api.visitkorea.or.kr/openapi/service/rest/KorService/searchKeyword?";
+            var etc = "serviceKey=5r3%2Bf8PsWZ96ejWh3oTgDYImPr7wL2l2zEL5Sw94uZyX40Pgo6NOdyedCj5VxSkHn8TYCwev64iVm0mvOWQFlA%3D%3D&MobileApp=AppTest&MobileOS=ETC&pageNo=" + pageno + "&startPage=1&listYN=Y&arrange=B&numOfRows=20&pageSize=20&keyword=" + keyword + "&output=json";
+            $.ajax({
+                type: 'GET', //통신방식(GET/POST)
+                url: baseurl + etc, //통신할 대상
+                dataType: 'json', //서버로부터 받을 데이터 형식
+                success: function (data) { //통신에 성공했을 때,
+                    console.log(data);
+                    var items = data.response.body.items.item;
+                    console.log(items);
+                    for (i = 0; i < items.length; i++) {
+                        title.push(items[i].title);
+                    }
+                    data4 = items;
+                    searchCode2(tmp);
+                }
+                , error: function (req) { //통신에 실패했을 때
+                    alert('통신실패, 상태:', req.responseText)
+                }
+            });
+        }
+
+        function searchCode2(sigu) {
+            cleaner();
+            if (data4.length > 1) {
+                $('.list-group').html("");
+                var output = "<div class='list-group'>";
+                $.each(data4, function (i, e) {
+                    if (e.title.indexOf($('#searchbar2').val()) != -1) {
+                        output += "<a href='KoreaTourMaster_detailpage1.html?&contentId=" + e.contentid + "&contenttypeid=" + e.contenttypeid + "&mapx=" + e.mapx + "&mapy=" + e.mapy + "' class='list-group-item list-group-item-primary'>";
+                        if (e.firstimage) {
+                            output += "<li class='list-group-item list-group-item-primary'><img src='" + e.firstimage + "' width='300px' height='150px'>" + "<h3>" + e.title + "</h3>";
+                        }
+                        if (e.firstimage == null) {
+                            output += "<li class='list-group-item list-group-item-primary'><img src='imgs/noImage.gif' width='140px' height='70px'>" + "<h3>" + e.title + "</h3>";
+                        };
+                        output += "<h5>" + e.addr1 + "</h5></li></a>";
+                    }
+                });
+                output += "</ul>";
+                $('#Searchafter').append(output);
+            }
+            else if (data4.length == undefined) {
+                $('.list-group').html("");
+                var output = "<div class='list-group'>";
+                output += "<a href='KoreaTourMaster_detailpage1.html?&contentId=" + data4.contentid + "&contenttypeid=" + data4.contenttypeid + "&mapx=" + data4.mapx + "&mapy=" + data4.mapy + "' class='list-group-item list-group-item-primary'>";
+                if (data4.firstimage) {
+                    output += "<li class='list-group-item list-group-item-primary'><img src='" + data4.firstimage + "' width='300px' height='150px'>" + data4.addr1;
+                }
+                if (data4.firstimage == null) {
+                    output += "<li class='list-group-item list-group-item-primary'><img src='imgs/noImage.gif' width='140px' height='70px'>" + data4.addr1;
+                };
+                output += "<h3>" + data4.title + "</h3></li></a>";
+                output += "</ul></div>";
+                $('#Searchafter').append(output);
+            }
+        };
+
+        function searchCode3(contentTypeId) {
+            $("[name='bigtitle']").css('display', 'none');
+            $('.sns').css('display', 'none');
+            searchType = 2;
+            //            $('.list-group').text("");
+            $('.title').empty();
+            $('.boxes').empty();
+            //            $('.example').empty();
+            areacodeS = $("#selectBox option:selected").val();
+            this.contentTypeId = contentTypeId;
+            console.log(contentTypeId);
+            console.log(areacodeS);
+            var baseurl = "http://api.visitkorea.or.kr/openapi/service/rest/KorService/areaBasedList?";
+            var etc = "ServiceKey=5r3%2Bf8PsWZ96ejWh3oTgDYImPr7wL2l2zEL5Sw94uZyX40Pgo6NOdyedCj5VxSkHn8TYCwev64iVm0mvOWQFlA%3D%3D&contentTypeId=" + contentTypeId + "&areaCode=" + areacodeS + "&sigunguCode=&cat1=&cat2=&cat3=&listYN=Y&MobileOS=ETC&MobileApp=TourAPI3.0_Guide&arrange=B&pageNo=" + pageno + "&startPage=1&numOfRows=20&pageSize=20&output=json";
+            $.ajax({
+                type: 'GET', //통신방식(GET/POST)
+                url: baseurl + etc, //통신할 대상
+                dataType: 'json', //서버로부터 받을 데이터 형식
+                success: function (data) { //통신에 성공했을 때,
+                    console.log(data);
+                    var items = data.response.body.items.item;
+                    for (i = 0; i < items.length; i++) {
+                        title.push(items[i].title);
+                    }
+                    data4 = items;
+                    $('.main').css('display', 'none');
+                    $('#Searchafter').css('display', 'block');
+                    var output = "<div class='list-group'>";
+                    $.each(data4, function (i, e) {
+                        if (e.title.indexOf($('#searchbar2').val()) != -1) {
+                            output += "<a href='KoreaTourMaster_detailpage1.html?&contentId=" + e.contentid + "&contenttypeid=" + e.contenttypeid + "&mapx=" + e.mapx + "&mapy=" + e.mapy + "' class='list-group-item list-group-item-primary'>";
+                            if (e.firstimage) {
+                                output += "<li class='list-group-item list-group-item-primary'><img src='" + e.firstimage + "' width='300px' height='150px'>" + "<h3>" + e.title + "</h3>";
+                            }
+                            if (e.firstimage == null) {
+                                output += "<li class='list-group-item list-group-item-primary'><img src='imgs/noImage.gif' width='140px' height='70px'>" + "<h3>" + e.title + "</h3>";
+                            };
+                            if (e.addr1 == undefined) {
+                                e.addr1 = "";
+                            }
+                            output += "<h5>" + e.addr1 + "</h5></li></a>";
+                        }
+                    });
+                    output += "</ul>";
+                    $('#Searchafter').append(output);
+                }
+                , error: function (req) { //통신에 실패했을 때
+                    alert('통신실패, 상태:', req.responseText)
+                }
+            });
+        };
+
+        function reload6(value) {
+            keyword = $('#searchbar3').val();
+            keyword2 = keyword.length;
+            if (keyword2 >= 2) {
+                //     alert('접속됨');
+                $('.list-group').text("");
+                var baseurl = "http://api.visitkorea.or.kr/openapi/service/rest/KorService/searchKeyword?";
+                var etc = "serviceKey=5r3%2Bf8PsWZ96ejWh3oTgDYImPr7wL2l2zEL5Sw94uZyX40Pgo6NOdyedCj5VxSkHn8TYCwev64iVm0mvOWQFlA%3D%3D&MobileApp=AppTest&MobileOS=ETC&pageNo=1&startPage=1&listYN=Y&arrange=B&numOfRows=8&pageSize=8&keyword=" + keyword + "&output=json";
+                $.ajax({
+                    type: 'GET', //통신방식(GET/POST)
+                    url: baseurl + etc, //통신할 대상
+                    dataType: 'json', //서버로부터 받을 데이터 형식
+                    success: function (data) { //통신에 성공했을 때,
+                        console.log(data);
+                        var items = data.response.body.items.item;
+                        console.log(items);
+                        for (i = 0; i < items.length; i++) {
+                            title.push(items[i].title);
+                        }
+                        var output2 = "<ul class='list-group' name='myList33' style='height: 500px;z-index:20;margin:auto;width:265px'>";
+                        for (i = 0; i < title.length; i++) {
+                            output2 += "<li class='list-group-item' onclick='click3(this)'>" + title[i] + "</li>"
+                        }
+                        output2 += "</ul>";
+                        $('#myList30').append(output2);
+                        title.length = 0;
+                        console.log(items);
+                        console.log(data);
+                        data4 = items;
+                        console.log(data4);
+                        keywordtemp = keyword;
+                        keyword = "";
+                        if ($('[name=myList33]').length > 1) {
+                            $('[name=myList33]')[0].remove();
+                        }
+                        //                        $('.list-group')[2].remove();
+                    }
+                    , error: function (req) { //통신에 실패했을 때
+                        alert('통신실패, 상태:', req.responseText)
+                    }
+                });
+            }
+        };
+
+        function goSearch3() {
+            $('.sns').css('display', 'none');
+            pageno = 1;
+            //            $("input[name='search3']").val() = keywordtemp;
+            searchType = 1;
+            var keyword = $('#searchbar3').val().trim();
+            var tmp = keyword.split(' ');
+            var baseurl = "http://api.visitkorea.or.kr/openapi/service/rest/KorService/searchKeyword?";
+            var etc = "serviceKey=5r3%2Bf8PsWZ96ejWh3oTgDYImPr7wL2l2zEL5Sw94uZyX40Pgo6NOdyedCj5VxSkHn8TYCwev64iVm0mvOWQFlA%3D%3D&MobileApp=AppTest&MobileOS=ETC&pageNo=" + pageno + "&startPage=1&listYN=Y&arrange=B&numOfRows=20&pageSize=20&keyword=" + keyword + "&output=json";
+            $(".bigmain").css("display", "none");
+            $("#Searchafter").css("display", "block");
+            $.ajax({
+                type: 'GET', //통신방식(GET/POST)
+                url: baseurl + etc, //통신할 대상
+                dataType: 'json', //서버로부터 받을 데이터 형식
+                success: function (data) { //통신에 성공했을 때,
+                    console.log(data);
+                    var items = data.response.body.items.item;
+                    console.log(items);
+                    for (i = 0; i < items.length; i++) {
+                        title.push(items[i].title);
+                    }
+                    data4 = items;
+                    searchCode4(tmp);
+                }
+                , error: function (req) { //통신에 실패했을 때
+                    alert('통신실패, 상태:', req.responseText)
+                }
+            })
+        }
+
+        function cleaner() {
+            if ($('div.list-group').length >= 2) {
+                $('div.list-group')[0].remove();
+            }
+        }
+
+        function cleaner2() {
+            if ($('div.list-group').length >= 2) {
+                $('div.list-group')[0].remove();
+            }
+        }
+
+        function searchCode4(sigu) {
+            cleaner();
+            if (data4.length > 1) {
+                $('.list-group').html("");
+                var output = "<div class='list-group'>";
+                $.each(data4, function (i, e) {
+                    if (e.title.indexOf($('#searchbar3').val()) != -1) {
+                        output += "<a href='KoreaTourMaster_detailpage1.html?&contentId=" + e.contentid + "&contenttypeid=" + e.contenttypeid + "&mapx=" + e.mapx + "&mapy=" + e.mapy + "' class='list-group-item list-group-item-primary'>";
+                        if (e.firstimage) {
+                            output += "<li class='list-group-item list-group-item-primary'><img src='" + e.firstimage + "' width='300px' height='150px'>" + "<h3>" + e.title + "</h3>";
+                        }
+                        if (e.firstimage == null) {
+                            output += "<li class='list-group-item list-group-item-primary'><img src='imgs/noImage.gif' width='140px' height='70px'>" + "<h3>" + e.title + "</h3>";
+                        };
+                        output += "<h5>" + e.addr1 + "</h5></li></a>";
+                    }
+                });
+                output += "</div>";
+                $('#Searchafter').append(output);
+            }
+            else if (data4.length == undefined) {
+                $('.list-group').html("");
+                var output = "<div class='list-group'>";
+                output += "<a href='KoreaTourMaster_detailpage1.html?&contentId=" + data4.contentid + "&contenttypeid=" + data4.contenttypeid + "&mapx=" + data4.mapx + "&mapy=" + data4.mapy + "' class='list-group-item list-group-item-primary'>";
+                if (data4.firstimage) {
+                    output += "<li class='list-group-item list-group-item-primary'><img src='" + data4.firstimage + "' width='300px' height='150px'>" + data4.addr1;
+                }
+                if (data4.firstimage == null) {
+                    output += "<li class='list-group-item list-group-item-primary'><img src='imgs/noImage.gif' width='140px' height='70px'>" + data4.addr1;
+                };
+                output += "<h3>" + data4.title + "</h3></li></a>";
+                output += "</div>";
+                $('#Searchafter').append(output);
+                //                document.getElementById("Searchafter").childNodes[3].remove();
+            }
+        };
+
+        function click3(value) {
+            var hehe = $(value).text();
+            $('#searchbar3').val(hehe);
+        }
+        $(window).scroll(function () {
+            if (searchType == 1) {
+                if ($(window).scrollTop() >= $(document).height() - $(window).height() - 1) {
+                    pageno++;
+                    goSearch2();
+                }
+            }
+            if (searchType > 0) {
+                if ($(window).scrollTop() >= $(document).height() - $(window).height()) {
+                    //                    alert('type2');
+                    pageno++;
+                    //                                            $('.list-group').remove();
+                    //                        $('#searchbar2').val() = keyword;
+                    //                  
+                    searchCode3(contentTypeId);
+                }
+                //            
+            }
+        });
+
+        function e() {
+            if (document.getElementsByName('myList1').length > 1) {
+                $(document.getElementsByName('myList1')[0]).remove();
+            }
+        }
+
+        function g() {
+            if (document.getElementsByName('myList21').length > 1) {
+                $(document.getElementsByName('myList21')[0]).remove();
+            }
+        }
+
+        function f() {
+            if (document.getElementsByName('myList33').length > 1) {
+                $(document.getElementsByName('myList33')[0]).remove();
+            }
+        }
+
+        function enter() {
+            if (window.event.keyCode == 13) {
+                goSearch();
+            }
+        }
+
+        function enter2() {
+            if (window.event.keyCode == 13) {
+                goSearch2();
+            }
+        }
+
+        function enter3() {
+            if (window.event.keyCode == 13) {
+                goSearch3();
+            }
+        }
+
+        function backing() {
+            window.location.reload();
+        }
+
+        function enterkey() {
+            //            if (window.event.keyCode == 13) {
+            //                var temp3 = $("li[class='list-group-item active']")[0];
+            //                console.log(temp3);
+            //                temp4 = $(temp3).text();
+            //                console.log(temp4);
+            //                $('#myInput').val(temp4);
+            //            }
+            //            if (window.event.keyCode == 38) {
+            //                var temp = $("li[class*='list-group-item'][style!='display: none;']");
+            //                console.log(temp);
+            //                var temp2 = $("li[class='list-group-item active']");
+            //                console.log(temp2);
+            //                $(temp2[0]).attr('class', 'list-group-item');
+            //                keyStandard--;
+            //                $(temp[keyStandard]).attr('class', 'list-group-item active');
+            //                console.log(keyStandard);
+            //            }
+            //            if (window.event.keyCode == 40) {
+            //                var temp = $("li[class*='list-group-item'][style!='display: none;']");
+            //                console.log(temp);
+            //                var temp2 = $("li[class='list-group-item active']");
+            //                console.log(temp2);
+            //                $(temp2[0]).attr('class', 'list-group-item');
+            //                $(temp[keyStandard]).attr('class', 'list-group-item active');
+            //                keyStandard++;
+            //                console.log(keyStandard);
+            //            }
+            //            if (window.event.keyCode == 8) {
+            //                if ($('#myInput').Text() == "") {
+            //                    reload3();
+            //                }
+            //                pagecode = 1;
+            //                var temp = $("li[class='list-group-item active']");
+            //                for (var i = 0; i < temp.length; i++) {
+            //                    $(temp[i]).attr('class', 'list-group-item');
+            //                }
+            //                keyStandard = 0;
+            //            }
+        }
+    </script>
+    <style>
+        @media (max-width: 600px) {
+            .main {
+                display: block;
+            }
+            .bigmain {
+                display: none;
+                width: 1px;
+                height: 1000px;
+            }
+            .sns {
+                float: left;
+                position: absolute;
+                left: 5%;
+                top: 100%;
+                width: 100%;
+                height: 10%;
+                opacity: 0.7;
+            }
+            #myList20 {
+                left: 7%;
+                top: 5%;
+            }
+            #goback2 {
+                height: 46px;
+            }
+        }
+        
+        @media (min-width: 601px) {
+            #goback2 {
+                height: 45px;
+            }
+            .main {
+                display: none
+            }
+            .bigmain {
+                display: block;
+                width: 1180px;
+                height: 700px;
+                margin-left: 13%;
+            }
+            .sns {
+                float: left;
+                position: absolute;
+                left: 48%;
+                top: 80%;
+                width: 65%;
+                height: 10%;
+                margin-top: 75px;
+            }
+            #myList20 {
+                left: 38%;
+                top: 5%;
+            }
+            #Searchafter {
+                position: relative;
+            }
+        }
+        /*
+        @media (max-width:1200px){
+            .boxes{
+                left:23%;
+            }
+        }
+        @media (min-width:1201px){
+            .boxes{
+                left:18%;
+            }
+        }
+*/
+        
+        .main {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background-color: bisque;
+            color: white;
+        }
+        
+        .cmp {
+            position: absolute;
+            border-radius: 3px;
+        }
+        
+        #title {
+            background-color: rgba(215, 127, 110, 1);
+        }
+        
+        .btn {
+            text-decoration: none;
+            color: white;
+            font-size: 40px;
+            position: absolute;
+            top: 20%;
+            font-family: 'Do Hyeon', sans-serif;
+        }
+        
+        body {
+            font-family: Arial;
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        div.example input[type=text] {
+            padding: 10px;
+            font-size: 17px;
+            border: 1px solid grey;
+            float: left;
+            width: 80%;
+            background: #f1f1f1;
+        }
+        
+        div.example button {
+            float: left;
+            width: 20%;
+            padding: 10px;
+            background: rgba(115, 162, 152, 1);
+            color: white;
+            font-size: 17px;
+            border: 1px solid grey;
+            border-left: none;
+            cursor: pointer;
+        }
+        
+        div.example button:hover {
+            background: rgba(237, 223, 185, 1);
+        }
+        
+        div.example::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+        
+        .list-group-item:hover {
+            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5) inset;
+            cursor: pointer;
+        }
+        
+        ;
+        #title4 {
+            text-align: center;
+            background-color: whitesmoke;
+            color: dimgrey;
+            font-style: fantasy;
+        }
+        
+        .logo3 {
+            border-radius: 15px;
+        }
+        
+        #Searchafter {
+            display: none;
+        }
+        
+        .boxes {
+            position: absolute;
+            width: 100%;
+            height: 40%;
+            top: 22%;
+            left: 25%;
+            z-index: 1;
+        }
+        
+        .box {
+            border: 4px solid bisque;
+            width: 10%;
+            background-color: antiquewhite;
+            display: inline-block;
+            position: absolute;
+            top: 25%;
+            /*            left: 10%;*/
+            font-family: 'Do Hyeon', sans-serif;
+            font-size: 20px;
+            /*            clear: both;*/
+            /*            content: "";*/
+            padding: 0px;
+            /*            float: left;*/
+        }
+        
+        .title {
+            font-family: 'Do Hyeon', sans-serif;
+        }
+        
+        #box1 {
+            /*            left: 6%;*/
+            min-width: 200px;
+            max-height: 300px;
+        }
+        
+        #box2 {
+            left: 18%;
+            min-width: 200px;
+            max-height: 300px;
+        }
+        
+        #box3 {
+            left: 36%;
+            min-width: 200px;
+            max-height: 300px;
+        }
+        
+        #box4 {
+            left: 54%;
+            min-width: 200px;
+            max-height: 300px;
+        }
+        
+        #box5 {
+            top: 113%;
+            /*            left: 6%;*/
+            min-width: 200px;
+            max-height: 300px;
+        }
+        
+        #box6 {
+            top: 113%;
+            left: 18%;
+            min-width: 200px;
+            max-height: 300px;
+        }
+        
+        #box7 {
+            top: 113%;
+            left: 36%;
+            min-width: 200px;
+            max-height: 300px;
+        }
+        
+        #box8 {
+            top: 113%;
+            left: 54%;
+            min-width: 200px;
+            max-height: 300px;
+        }
+        
+        div.desc {
+            text-align: center;
+            padding: 5px;
+        }
+        
+        body {
+            font-family: Arial;
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        form.example input[type=text] {
+            padding: 10px;
+            font-size: 17px;
+            border: 1px solid grey;
+            float: left;
+            width: 80%;
+            background: #f1f1f1;
+        }
+        
+        form.example button {
+            float: left;
+            width: 20%;
+            padding: 10px;
+            background: #2196F3;
+            color: white;
+            font-size: 17px;
+            border: 1px solid grey;
+            border-left: none;
+            cursor: pointer;
+        }
+        
+        form.example button:hover {
+            background: #0b7dda;
+        }
+        
+        form.example::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+        
+        #btn:hover {
+            cursor: pointer;
+        }
+        
+        .delbtn:hover {
+            cursor: pointer;
+            opacity: 0.6;
+        }
+        
+        #bookmarkmobile {
+            position: absolute;
+            background-color: aliceblue;
+            border: 2px solid currentColor;
+            top: 20%;
+            z-index: 99;
+            width: 360px;
+            max-height: 400px;
+        }
+        .cookiecontent{
+            margin-left:30px;
+        }
+    </style>
+</head>
+
+<body>
+    <!--    북마크-->
+    <div class="main">
+        <div class="cmp" style="left:0%;top:0%;width:100%;height:20%" id="title">
+            <div style="position:absolute;left:23%;top:10%;font-family: 'Yanone Kaffeesatz', sans-serif;font-size:250%;font-family:'Do Hyeon', sans-serif;">&nbsp;한국 여행</div>
+            <div>
+                <a href="#" style="text-decoration:none;" onclick="getcookiemobile();" data-toggle='collapse' data-target='#bookmarkmobile' ;><img src="bookmark1.png" style="margin-left:83vw;width:60px;height:60px;margin-top:2.4vh;opacity: 0.7">
+                    <h4 style="font-family: 'Yanone Kaffeesatz', sans-serif;font-size:120%;font-family:'Do Hyeon', sans-serif;z-index: 99;position: absolute;left:81vw;top:3vh;color:white;opacity: 0.8">즐겨찾기</h4></a>
+            </div>
+        </div>
+        <div id='bookmarkmobile' class='collapse' style="display: none;color: black;font-size:25px;font-family: 'Yanone Kaffeesatz', sans-serif;font-family:'Do Hyeon'">&nbsp;&nbsp;닫으려면 다시 버튼을 눌러주세요</div>
+        <div class="cmp" style="left:24%;top:12%;" id="searchdiv">
+            <div class="example" action="/action_page.php" style="margin:auto;max-width:300px">
+                <input type="text" placeholder="두글자 이상 입력하세요" name="search2" style="color:black;" onkeyup="reload4();" id="searchbar" onkeydown="enter();">
+                <button type="button" onclick="goSearch()"><i class="fa fa-search"></i></button>
+            </div>
+        </div>
+        <ul class="list-group" id="myList" style="position:absolute;left:24%;top:20%;color:black;z-index:1;" onkeydown="e();"></ul>
+        <div class="cmp" style="top:12%;">
+            <select id="selectBox" class="selectpicker" style="width:85px;height: 42px; text-align: center; background-color:rgba(115,162,152,1); color:aliceblue;" onchange="reload4();">
+                <option class="areacode" id="areacode0" value="" selected>지역</option>
+                <option class="areacode" id="areacode1" value="1">서울</option>
+                <option class="areacode" id="areacode2" value="2">인천</option>
+                <option class="areacode" id="areacode3" value="3">대전</option>
+                <option class="areacode" id="areacode4" value="4">대구</option>
+                <option class="areacode" id="areacode5" value="5">광주</option>
+                <option class="areacode" id="areacode6" value="6">부산</option>
+                <option class="areacode" id="areacode7" value="7">울산</option>
+                <option class="areacode" id="areacode8" value="8">세종특별자치시</option>
+                <option class="areacode" id="areacode8" value="31">경기도</option>
+                <option class="areacode" id="areacode8" value="32">강원도</option>
+                <option class="areacode" id="areacode8" value="33">충청북도</option>
+                <option class="areacode" id="areacode8" value="34">충청남도</option>
+                <option class="areacode" id="areacode8" value="35">경상북도</option>
+                <option class="areacode" id="areacode8" value="36">경상남도</option>
+                <option class="areacode" id="areacode8" value="37">전라북도</option>
+                <option class="areacode" id="areacode8" value="38">전라남도</option>
+                <option class="areacode" id="areacode8" value="39">제주도</option>
+            </select>
+        </div>
+        <div class="cmp" style="left:0%;top:20%;width:35%;height:20%;background-color:rgba(237,199,121,1);"><a href="#" class="btn" style="left:13%;" value="28" onclick="searchCode3(28)">레포츠</a></div>
+        <div class="cmp" style="left:35%;top:20%;width:65%;height:20%;background-color:rgba(115,162,152,1);"><a href="#" class="btn" style="left:30%;" value="39" onclick="searchCode3(39)">음식점</a></div>
+        <div class="cmp" style="left:0%;top:40%;width:55%;height:20%;background-color:rgba(237,223,185,1);"><a href="#" class="btn" style="left:20%;" value="25" onclick="searchCode3(25)">여행코스</a></div>
+        <div class="cmp" style="left:55%;top:40%;width:45%;height:20%;background-color:rgba(215,127,110,1);"><a href="#" class="btn" style="left:30%;" value="32" onclick="searchCode3(32)">쇼핑</a></div>
+        <div class="cmp" style="left:0%;top:60%;width:100%;height:20%;background-color:rgba(115,165,152,1);"><a href="#" class="btn" style="left:25%;" onclick="searchCode3(15)">축제공연행사</a></div>
+        <div class="cmp" style="left:0%;top:80%;width:35%;height:20%;background-color:rgba(237,223,185,1);"><a href="#" class="btn" style="left:13%;" onclick="searchCode3(12)">관광지</a></div>
+        <div class="cmp" style="left:35%;top:80%;width:65%;height:20%;background-color:rgba(237,199,121,1);"><a href="#" class="btn" style="left:23%;" onclick="searchCode3(14)">문화시설</a></div>
+    </div>
+    <div id="Searchafter">
+        <div class="cmp1" style="left:24%;top:13%;" id="searchdiv">
+            <div class="example" action="/action_page.php" style="margin:auto;max-width:360px">
+                <button type="button" style="width: 13%;font-size:32px;padding:0px;" id="goback2" onclick="backing();"> &lt;</button>
+                <input type="text" placeholder="두글자 이상 입력하세요" name="search3" style="color:black;width:67%" onkeyup="reload5();" id="searchbar2" onkeydown="enter2();">
+                <button type="button" onclick="goSearch2()"><i class="fa fa-search"></i></button>
+                <ul class="list-group" id="myList20" style="margin:auto;color:black;z-index:1;min-width: 300px;" onkeydown="g();"></ul>
+            </div>
+        </div>
+    </div>
+    <div class="bigmain" style="position:relative">
+        <div class="searchframe" style="position: absolute;left:50%;z-index: 2;">
+            <div class="title" name='bigtitle' style="font-size: 50px; text-align: center; height: 50%;margin-top: 5%;margin-bottom: 0px;">Korea Travel</div>
+            <form class="example" action="/action_page.php" name='bigtitle' style="margin:auto;max-width:300px;">
+                <input type="text" placeholder="Search.." name="search3" onkeyup="reload6();" id="searchbar3" onkeydown="enter3();">
+                <input type="text" style="display: none;" />
+                <button type="button" onclick="goSearch3()"> <i class="fa fa-search"></i></button>
+            </form>
+            <ul class="list-group" id="myList30" style="color:black;z-index:1;" onkeydown="f();"></ul>
+        </div>
+        <div class="boxes" style="position:absolute; top:10%;">
+            <a value="28" onclick="searchCode3(12)" href="#">
+                <div class="box" id="box1"> <img src="img/1.png" style="width:100%; height:100%;">
+                    <div class="desc">관광지</div>
+                </div>
+            </a>
+            <a value="28" onclick="searchCode3(14)" href="#">
+                <div class="box" id="box2"> <img src="img/2.png" style="width:100%; height:100%;">
+                    <div class="desc">문화시설</div>
+                </div>
+            </a>
+            <a value="28" onclick="searchCode3(15)" href="#">
+                <div class="box" id="box3"> <img src="img/3.png" style="width:100%; height:100%;">
+                    <div class="desc">축제공연행사</div>
+                </div>
+            </a>
+            <a value="28" onclick="searchCode3(25)" href="#">
+                <div class="box" id="box4"> <img src="img/4.png" style="width:100%; height:100%;">
+                    <div class="desc">여행코스</div>
+                </div>
+            </a>
+            <a value="28" onclick="searchCode3(28)" href="#">
+                <div class="box" id="box5"> <img src="img/5.png" style="width:100%; height:100%;">
+                    <div class="desc">레포츠</div>
+                </div>
+            </a>
+            <a value="28" onclick="searchCode3(28)" href="#">
+                <div class="box" id="box6"> <img src="img/6.png" style="width:100%; height:100%;">
+                    <div class="desc">숙박</div>
+                </div>
+            </a>
+            <a value="28" onclick="searchCode3(32)" href="#">
+                <div class="box" id="box7"> <img src="img/7.png" style="width:100%; height:100%;">
+                    <div class="desc">쇼핑</div>
+                </div>
+            </a>
+            <a value="28" onclick="searchCode3(39)" href="#">
+                <div class="box" id="box8"> <img src="img/8.png" style="width:100%; height:100%;">
+                    <div class="desc">음식점</div>
+                </div>
+            </a>
+        </div>
+        <div class="sns" style="position: absolute;">
+            <!-- Share on Twitter -->
+            <a href="#" onclick="javascript:window.open('https://twitter.com/intent/tweet?text=[%EA%B3%B5%EC%9C%A0]%20'
+            +encodeURIComponent(document.URL)+'%20-%20'+encodeURIComponent(document.title), 'twittersharedialog',
+             'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;" target="_blank" alt="Share on Twitter"><img src="img/Twitter.png"></a>
+            <!-- Share on Facebook -->
+            <a href="#" onclick="javascript:window.open('https://www.facebook.com/sharer/sharer.php?u='
+            +encodeURIComponent(document.URL)+'&amp;t='+encodeURIComponent(document.title), 'facebooksharedialog',
+             'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;" target="_blank" alt="Share on Facebook"> <img src="img/Facebook.png"></a>
+            <!-- Share on Google+ -->
+            <a href="#" onclick="javascript:window.open('https://plus.google.com/share?url='+encodeURIComponent(document.URL), 'googleplussharedialog','menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=350,width=600');return false;" target="_blank" alt="Share on Google+"> <img src="img/Google_Plus.png"></a>
+            <!-- Share on Kakaostory -->
+            <a href="#" onclick="javascript:window.open('https://story.kakao.com/s/share?url='+encodeURIComponent(document.URL), 'kakaostorysharedialog', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=400,width=600');return false;" target="_blank" alt="Share on kakaostory"> <img src="img/Kakao_Story.png"></a>
+            <!-- Share on Naver -->
+            <a href="#" onclick="javascript:window.open('http://share.naver.com/web/shareView.nhn?url='
+            +encodeURIComponent(document.URL)+'&amp;title='+encodeURIComponent(document.title),
+             'naversharedialog', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;" target="_blank" alt="Share on Naver"> <img src="img/Naver.png"></a>
+            <div id="bookmark" class="container-fluid">
+                <div class="container">
+                    <button id="btn1" onclick="getcookie();" class="btn btn-primary" data-toggle='collapse' data-target='#bookmark' ; style="margin-top: 50px;left:6.6%">즐겨찾기 보기</button>
+                    <div id='bookmark' class='collapse'> </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--북마크-->
+    <script>
+        function getcookiemobile() {
+            var bookmarknum = new Array();
+            var cookArr = document.cookie.split(';');
+            for (var i = 0; i < cookArr.length; i++) {
+                var seper = cookArr[i].split('=');
+                bookmarknum.push(seper[1]);
+            }
+            console.log(seper);
+            var bookmark = "";
+            for (var i = 0; i < bookmarknum.length; i++) {
+                var baseUrl = 'http://api.visitkorea.or.kr/openapi/service/rest/KorService/detailCommon?';
+                var etc = 'serviceKey=ckwvrNtlMREUqJZk%2FFnfuGKPi52FqxpqOjhN4eUIgwEmZ5QByyv3OyzK7XPrGBikJ%2BoBdWGjIi34tFHFYmEMDA%3D%3D&contentTypeId=&contentId=' + bookmarknum[i] + '&MobileOS=ETC&MobileApp=TourAPI3.0_Guide&defaultYN=Y&firstImageYN=Y&areacodeYN=Y&catcodeYN=Y&addrinfoYN=Y&mapinfoYN=Y&overviewYN=Y&transGuideYN=Y&output=json';
+                $.ajax({
+                    type: 'GET', //통신방식(GET/POST)
+                    url: baseUrl + etc, //통신할 대상 페이지
+                    dataType: 'json', //받을 데이터의 형식
+                    success: function (data) { //통신 성공시 실행할 문
+                        if (data != null) {
+                            var item = data.response.body.items.item;
+                            console.log(item.contentid + "," + item.contenttypeid + "," + item.mapx + "," + item.mapy + "," + item.title);
+                            //            bookmark = "<h4 id='"+item.contentId +"'><a href='KoreaTourMaster_detailpage1.html?&contentId="+ item.contentid + "&contenttypeid=" + item.contenttypeid + "&mapx=" + item.mapx + "&mapy=" + item.mapy +"'><b>" + item.title + "</b></a></h4>";
+                            bookmark = "<h4><a class='cookiecontent' href='KoreaTourMaster_detailpage1.html?&contentId=" + item.contentid + "&contenttypeid=" + item.contenttypeid + "&mapx=" + item.mapx + "&mapy=" + item.mapy + "'><b>" + item.title + "</b></a><button class='delbtn' value='" + item.contentid + "' onclick='delCookie(this.value)' style='display:inline-block;'>X</button></h4>";
+                            $('#bookmarkmobile').append(bookmark);
+                        }
+                    }
+                    , error: function (req) { //통신 실패시 실행할 문
+                        window.alert('!통신실패! 상태:' + req.responseText);
+                    }
+                });
+            }
+            $('#bookmarkmobile *').remove();
+            $
+            if (document.getElementById('bookmarkmobile').style.display == 'none') {
+                $('#bookmarkmobile').css('display', 'block');
+                $('#bookmarkmobile').css('z-index', '99');
+            }
+            else {
+                $('#bookmarkmobile').css('display', 'none');
+                $('#bookmarkmobile').css('z-index', '0');
+            }
+        }
+
+        function getcookie() {
+            var bookmarknum = new Array();
+            var cookArr = document.cookie.split(';');
+            for (var i = 0; i < cookArr.length; i++) {
+                var seper = cookArr[i].split('=');
+                bookmarknum.push(seper[1]);
+            }
+            console.log(seper);
+            var bookmark = "";
+            for (var i = 0; i < bookmarknum.length; i++) {
+                var baseUrl = 'http://api.visitkorea.or.kr/openapi/service/rest/KorService/detailCommon?';
+                var etc = 'serviceKey=ckwvrNtlMREUqJZk%2FFnfuGKPi52FqxpqOjhN4eUIgwEmZ5QByyv3OyzK7XPrGBikJ%2BoBdWGjIi34tFHFYmEMDA%3D%3D&contentTypeId=&contentId=' + bookmarknum[i] + '&MobileOS=ETC&MobileApp=TourAPI3.0_Guide&defaultYN=Y&firstImageYN=Y&areacodeYN=Y&catcodeYN=Y&addrinfoYN=Y&mapinfoYN=Y&overviewYN=Y&transGuideYN=Y&output=json';
+                $.ajax({
+                    type: 'GET', //통신방식(GET/POST)
+                    url: baseUrl + etc, //통신할 대상 페이지
+                    dataType: 'json', //받을 데이터의 형식
+                    success: function (data) { //통신 성공시 실행할 문
+                        if (data != null) {
+                            var item = data.response.body.items.item;
+                            console.log(item.contentid + "," + item.contenttypeid + "," + item.mapx + "," + item.mapy + "," + item.title);
+                            //            bookmark = "<h4 id='"+item.contentId +"'><a href='KoreaTourMaster_detailpage1.html?&contentId="+ item.contentid + "&contenttypeid=" + item.contenttypeid + "&mapx=" + item.mapx + "&mapy=" + item.mapy +"'><b>" + item.title + "</b></a></h4>";
+                            bookmark = "<h4><a href='KoreaTourMaster_detailpage1.html?&contentId=" + item.contentid + "&contenttypeid=" + item.contenttypeid + "&mapx=" + item.mapx + "&mapy=" + item.mapy + "'><b>" + item.title + "</b></a><button class='delbtn' value='" + item.contentid + "' onclick='delCookie(this.value)' style='display:inline-block;'>X</button></h4>";
+                            $('#bookmark').append(bookmark);
+                        }
+                    }
+                    , error: function (req) { //통신 실패시 실행할 문
+                        window.alert('!통신실패! 상태:' + req.responseText);
+                    }
+                });
+            }
+            $('#bookmark *').remove();
+        }
+
+        function delCookie(data) {
+            //첫번째 삭제 방법. 이미 존재하는 쿠키의 value에 빈 문자열을 삽입 ""
+            //만료일을 0으로
+            console.log(data);
+            setCookie(data, "", 0);
+            window.location.reload();
+        }
+
+        function setCookie(name, value, expires) {
+            document.cookie = name + "=" + value + ";" + expires + ";path=/"
+        }
+    </script>
+</body>
+
+</html>
+<!---->
